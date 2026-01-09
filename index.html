@@ -3,98 +3,117 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Video with Breathing Pixelated Glow</title>
+<title>Jork ittitle>
+
 <style>
-  html, body {
-    margin: 0; 
-    height: 100%;
-    background: #000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    font-family: sans-serif;
-    color: white;
-  }
+html, body {
+  margin: 0;
+  height: 100%;
+  font-family: sans-serif;
+  color: white;
 
-  .video-container {
-    position: relative;
-    display: inline-block;
-  }
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-  video {
-    display: block;
-    /* natural size */
-    filter: drop-shadow(0 0 3px white) drop-shadow(0 0 6px white);
-    image-rendering: pixelated;
-  }
+  background-color: #000;
+  overflow: hidden;
+}
 
-  /* Pixelated breathing glow around video using box-shadow */
-  .video-container.breathing video {
-    animation: breatheGlow 3s ease-in-out infinite;
-    /* Using multiple shadows to simulate pixelated glow */
+/* Subtle pixelated background */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,0.03) 0px,
+      rgba(255,255,255,0.03) 1px,
+      transparent 1px,
+      transparent 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,0.03) 0px,
+      rgba(255,255,255,0.03) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+  image-rendering: pixelated;
+  pointer-events: none;
+  opacity: 0.25;
+}
+
+.video-container {
+  position: relative;
+  display: inline-block;
+  z-index: 1;
+}
+
+video {
+  display: block;
+  image-rendering: pixelated;
+  filter:
+    drop-shadow(0 0 3px white)
+    drop-shadow(0 0 6px white);
+}
+
+/* Breathing glow */
+.video-container.breathing video {
+  animation: breatheGlow 3s ease-in-out infinite;
+  filter:
+    drop-shadow(0 0 2px white)
+    drop-shadow(0 0 5px white)
+    drop-shadow(0 0 8px white)
+    drop-shadow(0 0 12px white);
+}
+
+@keyframes breatheGlow {
+  0%, 100% {
     filter:
-      drop-shadow(0 0 2px white)
-      drop-shadow(0 0 5px white)
-      drop-shadow(0 0 8px white)
-      drop-shadow(0 0 12px white);
-    image-rendering: pixelated;
+      drop-shadow(0 0 1px rgba(255,255,255,0.25))
+      drop-shadow(0 0 3px rgba(255,255,255,0.25))
+      drop-shadow(0 0 6px rgba(255,255,255,0.25))
+      drop-shadow(0 0 9px rgba(255,255,255,0.25));
   }
-
-  @keyframes breatheGlow {
-    0%, 100% {
-      filter:
-        drop-shadow(0 0 1px rgba(255,255,255,0.3))
-        drop-shadow(0 0 3px rgba(255,255,255,0.3))
-        drop-shadow(0 0 5px rgba(255,255,255,0.3))
-        drop-shadow(0 0 8px rgba(255,255,255,0.3));
-    }
-    50% {
-      filter:
-        drop-shadow(0 0 4px rgba(255,255,255,0.9))
-        drop-shadow(0 0 8px rgba(255,255,255,0.9))
-        drop-shadow(0 0 12px rgba(255,255,255,0.9))
-        drop-shadow(0 0 16px rgba(255,255,255,0.9));
-    }
+  50% {
+    filter:
+      drop-shadow(0 0 4px rgba(255,255,255,0.85))
+      drop-shadow(0 0 8px rgba(255,255,255,0.85))
+      drop-shadow(0 0 12px rgba(255,255,255,0.85))
+      drop-shadow(0 0 16px rgba(255,255,255,0.85));
   }
-
-  #playButton {
-    margin-top: 20px;
-    padding: 10px 25px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    border: none;
-    background: white;
-    color: black;
-    border-radius: 6px;
-    user-select: none;
-  }
-
-  #playButton:hover {
-    background: #eee;
-  }
+}
 </style>
 </head>
+
 <body>
+
   <div class="video-container" id="videoContainer">
     <video id="video" src="video.mp4" playsinline></video>
   </div>
-  <button id="playButton">(˶ᵔ ᵕ ᵔ˶)</button>
 
 <script>
-  const video = document.getElementById('video');
-  const playButton = document.getElementById('playButton');
-  const container = document.getElementById('videoContainer');
+const video = document.getElementById('video');
+const container = document.getElementById('videoContainer');
 
-  playButton.addEventListener('click', () => {
-    video.play().then(() => {
-      container.classList.add('breathing');
-      playButton.style.display = 'none';
-    }).catch(err => {
-      alert('Playback failed. Please interact with the page or try again.');
-      console.error(err);
-    });
+let started = false;
+
+function startVideo() {
+  if (started) return;
+  started = true;
+
+  video.play().then(() => {
+    container.classList.add('breathing');
+  }).catch(err => {
+    console.error(err);
   });
+}
+
+// Click ANYWHERE to play (once)
+document.addEventListener('click', startVideo, { once: true });
 </script>
+
 </body>
 </html>
