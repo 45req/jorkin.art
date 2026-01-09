@@ -4,133 +4,142 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="icon" type="image/png" href="top.png">
-<title>Jork it</title>
+<title>Video</title>
 <style>
-  html, body {
+  * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+  }
+
+  html, body {
     height: 100%;
-    background: #050505;
+    background: #0a0a0a;
+    overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
-    transition: background 2s ease;
     font-family: system-ui, sans-serif;
   }
 
-  body.active {
-    background: #0c0c0c;
-  }
-
-  /* subtle noise */
+  /* subtle noise background */
   body::before {
     content: "";
     position: fixed;
     inset: 0;
-    background-image:
-      radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px);
-    background-size: 28px 28px;
+    background-image: 
+      radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 24px 24px;
     pointer-events: none;
-    z-index: 1;
+    z-index: 0;
   }
 
-  .video-wrapper {
+  .video-container {
     position: relative;
-    width: 94vmin;
-    max-width: 98vw;
-    max-height: 98vh;
-    aspect-ratio: 16 / 9;          /* ← change to your video's real aspect if needed (or remove) */
+    width: 92vmin;
+    max-width: 96vw;
+    max-height: 96vh;
     display: none;
-    z-index: 2;
+    z-index: 1;
   }
 
   video {
     width: 100%;
-    height: 100%;
-    object-fit: contain;
+    height: auto;
+    display: block;
     image-rendering: pixelated;
     border-radius: 6px;
-    display: block;
+    position: relative;
+    z-index: 2;
   }
 
-  /* The glow that actually works on sides */
-  .glow {
+  /* Glow effect that actually surrounds properly */
+  .video-container::before {
+    content: '';
     position: absolute;
-    inset: -30px;                    /* bigger negative inset = stronger side reach */
-    border-radius: 36px;
+    inset: -28px;                    /* key: big negative inset */
+    border-radius: 32px;
+    background: radial-gradient(
+      circle at center,
+      rgba(255,255,255,0.38) 0%,
+      rgba(255,255,255,0.14) 45%,
+      transparent 70%
+    );
+    filter: blur(14px);
+    opacity: 0.6;
+    z-index: 0;
     pointer-events: none;
-    z-index: 1;
-    opacity: 0.8;
-    box-shadow: 
-      0 0 40px 20px rgba(255,255,255,0.35),
-      0 0 80px 40px rgba(255,255,255,0.22),
-      0 0 140px 70px rgba(255,255,255,0.12),
-      inset 0 0 60px 20px rgba(255,255,255,0.15);
-    animation: breathe 3.6s ease-in-out infinite;
+    animation: breathe 3.8s ease-in-out infinite;
   }
 
   @keyframes breathe {
     0%, 100% {
-      opacity: 0.5;
-      filter: blur(8px);
+      opacity: 0.4;
+      filter: blur(12px);
     }
     50% {
-      opacity: 1;
-      filter: blur(22px);
+      opacity: 0.95;
+      filter: blur(24px);
     }
   }
 
+  /* Cute play overlay */
   #playOverlay {
     position: fixed;
     inset: 0;
-    cursor: pointer;
-    z-index: 10;
+    background: rgba(0,0,0,0.15);
+    color: white;
+    font-size: 5rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #ffffff;
-    font-size: 4.5rem;
-    user-select: none;
+    cursor: pointer;
+    z-index: 10;
     transition: opacity 0.7s ease;
-    background: rgba(0,0,0,0.1);
+    user-select: none;
+  }
+
+  #playOverlay.hidden {
+    opacity: 0;
+    pointer-events: none;
   }
 </style>
 </head>
 <body>
-<div class="video-wrapper" id="wrapper">
-  <div class="glow"></div>
-  <video id="video" src="video.mp4" playsinline muted></video>
-</div>
 
-<div id="playOverlay">(˶˃ ᵕ ˂˶)</div>
+  <div class="video-container" id="videoContainer">
+    <video id="video" src="video.mp4" playsinline></video>
+  </div>
+
+  <div id="playOverlay">(˶˃ ᵕ ˂˶)</div>
 
 <script>
-  const overlay = document.getElementById("playOverlay");
-  const video = document.getElementById("video");
-  const wrapper = document.getElementById("wrapper");
+  const video = document.getElementById('video');
+  const overlay = document.getElementById('playOverlay');
+  const container = document.getElementById('videoContainer');
 
-  overlay.addEventListener("click", () => {
-    video.play().then(() => {
-      overlay.style.opacity = "0";
-      setTimeout(() => {
-        overlay.style.display = "none";
-        wrapper.style.display = "block";
-        document.body.classList.add("active");
-      }, 700);
-    }).catch(err => {
-      console.warn("Video playback failed (common on mobile without interaction):", err);
-      // Fallback: just hide overlay anyway
-      overlay.style.opacity = "0";
-      setTimeout(() => {
-        overlay.style.display = "none";
-        wrapper.style.display = "block";
-      }, 700);
-    });
+  overlay.addEventListener('click', () => {
+    video.play()
+      .then(() => {
+        overlay.classList.add('hidden');
+        setTimeout(() => {
+          overlay.style.display = 'none';
+          container.style.display = 'block';
+        }, 700);
+      })
+      .catch(err => {
+        console.warn("Playback failed:", err);
+        // Fallback: at least hide overlay
+        overlay.classList.add('hidden');
+        setTimeout(() => {
+          overlay.style.display = 'none';
+          container.style.display = 'block';
+        }, 700);
+      });
   });
 
-  // Optional: auto-play on desktop if possible
-  if (!/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
+  // Optional: try muted autoplay on desktop
+  if (!/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
     video.muted = true;
     video.play().catch(() => {});
   }
