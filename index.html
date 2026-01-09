@@ -5,34 +5,51 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Video with Breathing Pixelated Glow</title>
 <style>
+  /* Body & html fill viewport */
   html, body {
-    margin: 0; 
+    margin: 0;
     height: 100%;
-    background: #000;
+    background: #111; /* dark but not pitch black */
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
     font-family: sans-serif;
-    color: white;
+    overflow: hidden;
+    position: relative;
   }
 
+  /* Subtle small dot noise background pattern */
+  body::before {
+    content: "";
+    pointer-events: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image:
+      radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+    z-index: 0;
+  }
+
+  /* Hide video container initially */
   .video-container {
     position: relative;
-    display: inline-block;
+    display: none;
+    z-index: 1;
   }
 
   video {
     display: block;
     /* natural size */
-    filter: drop-shadow(0 0 3px white) drop-shadow(0 0 6px white);
     image-rendering: pixelated;
   }
 
-  /* Pixelated breathing glow around video using box-shadow */
+  /* Breathing pixelated glow on video */
+  .video-container.breathing {
+    display: inline-block;
+  }
+
   .video-container.breathing video {
     animation: breatheGlow 3s ease-in-out infinite;
-    /* Using multiple shadows to simulate pixelated glow */
     filter:
       drop-shadow(0 0 2px white)
       drop-shadow(0 0 5px white)
@@ -58,16 +75,23 @@
     }
   }
 
+  /* Centered Play Button */
   #playButton {
-    margin-top: 20px;
-    padding: 10px 25px;
-    font-size: 1.1rem;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 16px 36px;
+    font-size: 1.2rem;
     cursor: pointer;
     border: none;
     background: white;
     color: black;
-    border-radius: 6px;
+    border-radius: 8px;
     user-select: none;
+    z-index: 10;
+    box-shadow: 0 0 8px rgba(255,255,255,0.7);
+    transition: background-color 0.3s ease;
   }
 
   #playButton:hover {
@@ -76,9 +100,11 @@
 </style>
 </head>
 <body>
+
   <div class="video-container" id="videoContainer">
     <video id="video" src="video.mp4" playsinline></video>
   </div>
+
   <button id="playButton">Play Video with Sound</button>
 
 <script>
@@ -89,6 +115,7 @@
   playButton.addEventListener('click', () => {
     video.play().then(() => {
       container.classList.add('breathing');
+      container.style.display = 'inline-block';
       playButton.style.display = 'none';
     }).catch(err => {
       alert('Playback failed. Please interact with the page or try again.');
@@ -96,5 +123,6 @@
     });
   });
 </script>
+
 </body>
 </html>
