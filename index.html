@@ -3,100 +3,104 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-<!-- Browser tab icon -->
 <link rel="icon" type="image/png" href="top.png">
-
 <title>Video</title>
 
 <style>
   html, body {
     margin: 0;
     height: 100%;
-    background: #0a0a0a;
+    background: #050505;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    position: relative;
+    transition: background 2s ease;
   }
 
+  body.active {
+    background: #0c0c0c;
+  }
+
+  /* subtle noise */
   body::before {
     content: "";
-    pointer-events: none;
     position: fixed;
     inset: 0;
     background-image:
-      radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
-    background-size: 22px 22px;
-    z-index: 0;
+      radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
   }
 
-  .video-container {
+  .video-wrapper {
     position: relative;
     display: none;
-    z-index: 1;
   }
 
   video {
     display: block;
     image-rendering: pixelated;
     position: relative;
-    z-index: 1;
+    z-index: 2;
   }
 
-  .video-container.breathing {
-    display: inline-block;
-  }
-
-  .video-container.breathing::before {
-    content: '';
+  /* TRUE EVEN GLOW */
+  .glow {
     position: absolute;
-    top: -14px;
-    left: -14px;
-    right: -14px;
-    bottom: -14px;
-    background: white;
-    filter: blur(6px);
+    inset: 0;
+    outline: 8px solid rgba(255,255,255,0.8);
+    filter: blur(10px);
     opacity: 0.6;
+    z-index: 1;
     animation: breathe 3s ease-in-out infinite;
-    z-index: 0;
   }
 
   @keyframes breathe {
-    0%, 100% { opacity: 0.35; }
-    50% { opacity: 0.85; }
+    0%, 100% {
+      opacity: 0.35;
+      filter: blur(8px);
+    }
+    50% {
+      opacity: 0.85;
+      filter: blur(14px);
+    }
   }
 
-  /* Fullscreen invisible play overlay */
-  #playButton {
+  /* fullscreen click overlay */
+  #playOverlay {
     position: fixed;
     inset: 0;
-    background: transparent;
-    border: none;
     cursor: pointer;
     z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 2rem;
+    user-select: none;
   }
 </style>
 </head>
 <body>
 
-  <div class="video-container" id="videoContainer">
-    <video id="video" src="video.mp4" playsinline></video>
-  </div>
+<div class="video-wrapper" id="wrapper">
+  <div class="glow"></div>
+  <video id="video" src="video.mp4" playsinline></video>
+</div>
 
-  <button id="playButton" aria-label="Play"></button>
+<div id="playOverlay">(˶˃ ᵕ ˂˶)</div>
 
 <script>
-  const video = document.getElementById('video');
-  const playButton = document.getElementById('playButton');
-  const container = document.getElementById('videoContainer');
+  const overlay = document.getElementById("playOverlay");
+  const video = document.getElementById("video");
+  const wrapper = document.getElementById("wrapper");
 
-  playButton.addEventListener('click', () => {
+  overlay.addEventListener("click", () => {
     video.play().then(() => {
-      container.classList.add('breathing');
-      container.style.display = 'inline-block';
-      playButton.style.display = 'none';
+      overlay.style.display = "none";
+      wrapper.style.display = "block";
+      document.body.classList.add("active");
     });
   });
 </script>
