@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Video with Pixelated White Glow</title>
+<style>
+  html, body {
+    margin: 0; 
+    height: 100%;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .video-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  video {
+    display: block;
+    /* No resizing: natural size */
+  }
+
+  /* Glow effect */
+  .video-container::before {
+    content: '';
+    position: absolute;
+    top: -12px;
+    left: -12px;
+    right: -12px;
+    bottom: -12px;
+    pointer-events: none;
+    filter: blur(4px);
+    background: white;
+    opacity: 0.6;
+    z-index: -1;
+    image-rendering: pixelated;
+  }
+</style>
+</head>
+<body>
+  <div class="video-container">
+    <video src="video.mp4" autoplay loop muted></video>
+  </div>
+</body>
+</html>
