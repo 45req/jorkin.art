@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Video with Pixelated White Glow</title>
+<title>Video with Breathing Pixelated White Glow</title>
 <style>
   html, body {
     margin: 0; 
@@ -21,10 +21,10 @@
 
   video {
     display: block;
-    /* No resizing: natural size */
+    /* natural size */
   }
 
-  /* Glow effect */
+  /* Breathing glow effect */
   .video-container::before {
     content: '';
     position: absolute;
@@ -33,17 +33,31 @@
     right: -12px;
     bottom: -12px;
     pointer-events: none;
-    filter: blur(4px);
     background: white;
+    filter: blur(4px);
     opacity: 0.6;
     z-index: -1;
     image-rendering: pixelated;
+
+    /* Animate breathing */
+    animation: breatheGlow 3s ease-in-out infinite;
+  }
+
+  @keyframes breatheGlow {
+    0%, 100% {
+      opacity: 0.4;
+      filter: blur(3px);
+    }
+    50% {
+      opacity: 0.8;
+      filter: blur(6px);
+    }
   }
 </style>
 </head>
 <body>
   <div class="video-container">
-    <video src="video.mp4" autoplay loop muted></video>
+    <video src="video.mp4" autoplay loop></video>
   </div>
 </body>
 </html>
