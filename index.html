@@ -2,147 +2,99 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<link rel="icon" type="image/png" href="top.png">
-<title>Video</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Video with Breathing Pixelated Glow</title>
 <style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
   html, body {
+    margin: 0; 
     height: 100%;
-    background: #0a0a0a;
-    overflow: hidden;
+    background: #000;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: system-ui, sans-serif;
-  }
-
-  /* subtle noise background */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background-image: 
-      radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
-    background-size: 24px 24px;
-    pointer-events: none;
-    z-index: 0;
+    flex-direction: column;
+    font-family: sans-serif;
+    color: white;
   }
 
   .video-container {
     position: relative;
-    width: 92vmin;
-    max-width: 96vw;
-    max-height: 96vh;
-    display: none;
-    z-index: 1;
+    display: inline-block;
   }
 
   video {
-    width: 100%;
-    height: auto;
     display: block;
+    /* natural size */
+    filter: drop-shadow(0 0 3px white) drop-shadow(0 0 6px white);
     image-rendering: pixelated;
-    border-radius: 6px;
-    position: relative;
-    z-index: 2;
   }
 
-  /* Glow effect that actually surrounds properly */
-  .video-container::before {
-    content: '';
-    position: absolute;
-    inset: -28px;                    /* key: big negative inset */
-    border-radius: 32px;
-    background: radial-gradient(
-      circle at center,
-      rgba(255,255,255,0.38) 0%,
-      rgba(255,255,255,0.14) 45%,
-      transparent 70%
-    );
-    filter: blur(14px);
-    opacity: 0.6;
-    z-index: 0;
-    pointer-events: none;
-    animation: breathe 3.8s ease-in-out infinite;
+  /* Pixelated breathing glow around video using box-shadow */
+  .video-container.breathing video {
+    animation: breatheGlow 3s ease-in-out infinite;
+    /* Using multiple shadows to simulate pixelated glow */
+    filter:
+      drop-shadow(0 0 2px white)
+      drop-shadow(0 0 5px white)
+      drop-shadow(0 0 8px white)
+      drop-shadow(0 0 12px white);
+    image-rendering: pixelated;
   }
 
-  @keyframes breathe {
+  @keyframes breatheGlow {
     0%, 100% {
-      opacity: 0.4;
-      filter: blur(12px);
+      filter:
+        drop-shadow(0 0 1px rgba(255,255,255,0.3))
+        drop-shadow(0 0 3px rgba(255,255,255,0.3))
+        drop-shadow(0 0 5px rgba(255,255,255,0.3))
+        drop-shadow(0 0 8px rgba(255,255,255,0.3));
     }
     50% {
-      opacity: 0.95;
-      filter: blur(24px);
+      filter:
+        drop-shadow(0 0 4px rgba(255,255,255,0.9))
+        drop-shadow(0 0 8px rgba(255,255,255,0.9))
+        drop-shadow(0 0 12px rgba(255,255,255,0.9))
+        drop-shadow(0 0 16px rgba(255,255,255,0.9));
     }
   }
 
-  /* Cute play overlay */
-  #playOverlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.15);
-    color: white;
-    font-size: 5rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  #playButton {
+    margin-top: 20px;
+    padding: 10px 25px;
+    font-size: 1.1rem;
     cursor: pointer;
-    z-index: 10;
-    transition: opacity 0.7s ease;
+    border: none;
+    background: white;
+    color: black;
+    border-radius: 6px;
     user-select: none;
   }
 
-  #playOverlay.hidden {
-    opacity: 0;
-    pointer-events: none;
+  #playButton:hover {
+    background: #eee;
   }
 </style>
 </head>
 <body>
-
   <div class="video-container" id="videoContainer">
     <video id="video" src="video.mp4" playsinline></video>
   </div>
-
-  <div id="playOverlay">(˶˃ ᵕ ˂˶)</div>
+  <button id="playButton">(˶ᵔ ᵕ ᵔ˶)</button>
 
 <script>
   const video = document.getElementById('video');
-  const overlay = document.getElementById('playOverlay');
+  const playButton = document.getElementById('playButton');
   const container = document.getElementById('videoContainer');
 
-  overlay.addEventListener('click', () => {
-    video.play()
-      .then(() => {
-        overlay.classList.add('hidden');
-        setTimeout(() => {
-          overlay.style.display = 'none';
-          container.style.display = 'block';
-        }, 700);
-      })
-      .catch(err => {
-        console.warn("Playback failed:", err);
-        // Fallback: at least hide overlay
-        overlay.classList.add('hidden');
-        setTimeout(() => {
-          overlay.style.display = 'none';
-          container.style.display = 'block';
-        }, 700);
-      });
+  playButton.addEventListener('click', () => {
+    video.play().then(() => {
+      container.classList.add('breathing');
+      playButton.style.display = 'none';
+    }).catch(err => {
+      alert('Playback failed. Please interact with the page or try again.');
+      console.error(err);
+    });
   });
-
-  // Optional: try muted autoplay on desktop
-  if (!/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-    video.muted = true;
-    video.play().catch(() => {});
-  }
 </script>
 </body>
 </html>
