@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="icon" type="image/png" href="top.png">
 <title>Jork it</title>
 <style>
   html, body {
     margin: 0;
+    padding: 0;
     height: 100%;
     background: #050505;
     display: flex;
@@ -15,70 +16,71 @@
     align-items: center;
     overflow: hidden;
     transition: background 2s ease;
+    font-family: system-ui, sans-serif;
   }
 
   body.active {
     background: #0c0c0c;
   }
 
-  /* subtle noise overlay */
+  /* subtle noise */
   body::before {
     content: "";
     position: fixed;
     inset: 0;
     background-image:
-      radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
-    background-size: 24px 24px;
+      radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 28px 28px;
     pointer-events: none;
+    z-index: 1;
   }
 
   .video-wrapper {
     position: relative;
-    width: 92vmin;
-    height: auto;
-    max-width: 100vw;
-    max-height: 100vh;
+    width: 94vmin;
+    max-width: 98vw;
+    max-height: 98vh;
+    aspect-ratio: 16 / 9;          /* ← change to your video's real aspect if needed (or remove) */
     display: none;
+    z-index: 2;
   }
 
   video {
-    display: block;
-    image-rendering: pixelated;
     width: 100%;
-    height: auto;
-    border-radius: 4px;          /* slight rounding helps glow look natural */
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    border-radius: 6px;
+    display: block;
   }
 
-  /* Improved glow - works properly on all sides */
+  /* The glow that actually works on sides */
   .glow {
     position: absolute;
-    inset: -18px;                /* extends nicely beyond edges */
-    border-radius: 22px;         /* bigger than video to soften */
-    background: radial-gradient(
-      circle at center,
-      rgba(255,255,255,0.28) 0%,
-      rgba(255,255,255,0.12) 45%,
-      transparent 70%
-    );
-    filter: blur(12px);
-    opacity: 0.75;
+    inset: -30px;                    /* bigger negative inset = stronger side reach */
+    border-radius: 36px;
     pointer-events: none;
     z-index: 1;
-    animation: breathe 3.4s ease-in-out infinite;
+    opacity: 0.8;
+    box-shadow: 
+      0 0 40px 20px rgba(255,255,255,0.35),
+      0 0 80px 40px rgba(255,255,255,0.22),
+      0 0 140px 70px rgba(255,255,255,0.12),
+      inset 0 0 60px 20px rgba(255,255,255,0.15);
+    animation: breathe 3.6s ease-in-out infinite;
   }
 
   @keyframes breathe {
     0%, 100% {
-      opacity: 0.45;
-      filter: blur(10px);
+      opacity: 0.5;
+      filter: blur(8px);
     }
     50% {
-      opacity: 0.95;
-      filter: blur(20px);
+      opacity: 1;
+      filter: blur(22px);
     }
   }
 
-  /* fullscreen click overlay */
   #playOverlay {
     position: fixed;
     inset: 0;
@@ -87,17 +89,18 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white;
-    font-size: 3.5rem;
+    color: #ffffff;
+    font-size: 4.5rem;
     user-select: none;
-    transition: opacity 0.6s ease;
+    transition: opacity 0.7s ease;
+    background: rgba(0,0,0,0.1);
   }
 </style>
 </head>
 <body>
 <div class="video-wrapper" id="wrapper">
   <div class="glow"></div>
-  <video id="video" src="video.mp4" playsinline></video>
+  <video id="video" src="video.mp4" playsinline muted></video>
 </div>
 
 <div id="playOverlay">(˶˃ ᵕ ˂˶)</div>
@@ -114,11 +117,23 @@
         overlay.style.display = "none";
         wrapper.style.display = "block";
         document.body.classList.add("active");
-      }, 600);
+      }, 700);
     }).catch(err => {
-      console.log("Playback failed:", err);
+      console.warn("Video playback failed (common on mobile without interaction):", err);
+      // Fallback: just hide overlay anyway
+      overlay.style.opacity = "0";
+      setTimeout(() => {
+        overlay.style.display = "none";
+        wrapper.style.display = "block";
+      }, 700);
     });
   });
+
+  // Optional: auto-play on desktop if possible
+  if (!/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
+    video.muted = true;
+    video.play().catch(() => {});
+  }
 </script>
 </body>
 </html>
